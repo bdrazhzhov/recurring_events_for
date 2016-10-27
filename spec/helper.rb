@@ -1,7 +1,7 @@
 require 'pg'
 
 begin
-  $db_conn = PGconn.open(:dbname => 'recurring_events_test')
+  $db_conn = PGconn.open(dbname: 'recurring', user: 'curago', password: '123')
 
   $db_conn.exec 'SET TIMEZONE TO UTC;'
   $db_conn.exec File.read(File.dirname(__FILE__) + '/../events.sql')

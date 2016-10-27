@@ -29,7 +29,8 @@ BEGIN
     FOR next_date IN
       SELECT *
         FROM generate_recurrences(
-          duration,
+          event.frequency,
+          event.separation,
           recurrences_start,
           COALESCE(event.ends_at::date, event.ends_on),
           range_start::date,
