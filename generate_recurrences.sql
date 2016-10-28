@@ -19,14 +19,15 @@ DECLARE
   intervals INT := FLOOR(intervals_between(original_start_date, range_start, duration));
   current_month INT;
   current_week INT;
+  week_factor INT;
 BEGIN
   IF repeat_month IS NOT NULL THEN
     start_date := start_date + (((12 + repeat_month - cast(extract(month from start_date) as int)) % 12) || ' months')::interval;
   END IF;
   IF repeat_week IS NULL AND repeat_day IS NOT NULL THEN
---     start_date := start_date + (((7 + repeat_day - cast(extract(dow from start_date) as int)) % 7) || ' days')::interval;
     IF frequency = 'weekly' THEN
-      start_date := start_date + (((7 + repeat_day - cast(extract(dow from start_date) as int)) % 7) || ' days')::interval;
+      week_factor := 7 * separation;
+      start_date := start_date + (((week_factor + repeat_day - cast(extract(dow from start_date) as int)) % week_factor) || ' days')::interval;
     ELSE
       start_date := start_date + (repeat_day - extract(day from start_date) || ' days')::interval;
     END IF;
@@ -34,6 +35,7 @@ BEGIN
   LOOP
     next_date := start_date + duration * intervals;
     IF repeat_week IS NOT NULL AND repeat_day IS NOT NULL THEN
+      RAISE NOTICE 'repeat_week IS NOT NULL AND repeat_day IS NOT NULL';
       current_month := extract(month from next_date);
       next_date := next_date + (((7 + repeat_day - cast(extract(dow from next_date) as int)) % 7) || ' days')::interval;
       IF extract(month from next_date) != current_month THEN
